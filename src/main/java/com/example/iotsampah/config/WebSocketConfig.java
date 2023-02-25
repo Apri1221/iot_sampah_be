@@ -23,9 +23,14 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
-        registry.addEndpoint("/broker").setAllowedOrigins("http://localhost:3000");
+//        registry.addEndpoint("/broker").setAllowedOrigins("http://localhost:3000");
+//        registry.addEndpoint("/broker")
+//                .setAllowedOrigins("http://localhost:3000") // not setAllowedOriginPatterns
+//                .withSockJS();
+
+        registry.addEndpoint("/broker").setAllowedOrigins("https://iot-sampah-aprijplt.vercel.app");
         registry.addEndpoint("/broker")
-                .setAllowedOrigins("http://localhost:3000") // not setAllowedOriginPatterns
+                .setAllowedOrigins("https://iot-sampah-aprijplt.vercel.app") // not setAllowedOriginPatterns
                 .withSockJS();
 
 //        registry.addEndpoint("/secured/room")
