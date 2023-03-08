@@ -138,10 +138,11 @@ public class MqttService implements MqttCallback {
             if (Math.abs(newData - dataCalc[0]) > 3 * std) {
                 System.out.printf("%s is outlier", newData);
                 this.isOutliersJarak = true;
+            } else {
+                this.dataJarak.add(newData);
             }
             if (dataJarak.size() > 100) this.dataJarak = new ArrayList<Double>();
         }
-        this.dataJarak.add(newData);
     }
 
     public void dataDeviceIR(String messageStr) {
