@@ -142,6 +142,8 @@ public class MqttService implements MqttCallback {
                 this.dataJarak.add(newData);
             }
             if (dataJarak.size() > 100) this.dataJarak = new ArrayList<Double>();
+        } else {
+            this.dataJarak.add(newData);
         }
     }
 
