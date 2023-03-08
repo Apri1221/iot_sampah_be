@@ -131,17 +131,18 @@ public class MqttService implements MqttCallback {
 
     public void dataDeviceJarak(String messageStr) {
         double newData = Double.parseDouble(messageStr);
-        if (dataJarak.size() > 15) {
+        if (dataJarak.size() > 3) {
             Double[] dataCalc = this.calculateStats(this.dataJarak);
             double std = Math.sqrt(dataCalc[1]);
             System.out.printf("Avg = %s, std = %s, data = %s%n", dataCalc[0], 3 * std, newData);
             if (Math.abs(newData - dataCalc[0]) > 3 * std) {
-                System.out.printf("%s is outlier", newData);
+                System.out.printf("%s is outlier%n", newData);
                 this.isOutliersJarak = true;
+                this.dataJarak = new ArrayList<>();
             } else {
                 this.dataJarak.add(newData);
             }
-            if (dataJarak.size() > 100) this.dataJarak = new ArrayList<Double>();
+            if (dataJarak.size() > 100) this.dataJarak = new ArrayList<>();
         } else {
             this.dataJarak.add(newData);
         }
