@@ -27,7 +27,7 @@ public class MstDevicesController {
         return ResponseEntity.ok("success");
     }
 
-    @PostMapping("/get/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity getDevice(@PathVariable(value = "id") Integer id) {
         MstDevices mstDevices = mstDevicesService.getDevice(id);
         return ResponseEntity.ok(mstDevices);

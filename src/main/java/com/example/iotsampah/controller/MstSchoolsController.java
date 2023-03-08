@@ -28,7 +28,7 @@ public class MstSchoolsController {
         return ResponseEntity.ok("success");
     }
 
-    @PostMapping("/get/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity getSchool(@PathVariable(value = "id") Integer id) {
         MstSchools mstSchools = mstSchoolsService.getSchool(id);
         return ResponseEntity.ok(mstSchools);

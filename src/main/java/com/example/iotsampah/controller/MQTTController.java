@@ -37,7 +37,8 @@ public class MQTTController {
             @RequestParam(value = "topic", required = false) String topic,
             @RequestParam(value = "school_id") Integer schoolId) throws MqttException, URISyntaxException {
         List<String> topics = topic == null ? new ArrayList<>() : Arrays.asList(topic.split("\\s*,\\s*"));
-        String clientId = UUID.randomUUID().toString();
+        Integer clientId = schoolId;
+//        String clientId = UUID.randomUUID().toString();
         if (topics.size() == 0) {
             topics = mstDevicesService.getTopicsBySchoolId(schoolId);
         }

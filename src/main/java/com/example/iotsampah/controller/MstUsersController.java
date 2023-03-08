@@ -26,9 +26,15 @@ public class MstUsersController {
         return ResponseEntity.ok("success");
     }
 
-    @PostMapping("/get/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity getUser(@PathVariable(value = "id") Integer id) {
         MstUsers mstUsers = mstUsersService.getUser(id);
+        return ResponseEntity.ok(mstUsers);
+    }
+
+    @GetMapping("/{nis}")
+    public ResponseEntity getUser(@PathVariable(value = "nis") String nis) {
+        MstUsers mstUsers = mstUsersService.getUser(nis);
         return ResponseEntity.ok(mstUsers);
     }
 }

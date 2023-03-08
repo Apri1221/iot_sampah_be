@@ -14,10 +14,9 @@ import javax.persistence.*;
 @Setter
 @Table(name = "mst_users")
 public class MstUsers {
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "school_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     private MstSchools school;
 
     @Id

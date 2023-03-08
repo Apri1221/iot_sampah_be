@@ -34,6 +34,11 @@ public class MstUsersService {
         return mstUser.orElse(null);
     }
 
+    public MstUsers getUser(String nis) {
+        Optional<MstUsers> mstUser = mstUsersRepository.findByNis(nis);
+        return mstUser.orElse(null);
+    }
+
     public List<MstUsers> getAllUsers() {
         List<MstUsers> mstUsers = mstUsersRepository.findAll();
         return mstUsers;
