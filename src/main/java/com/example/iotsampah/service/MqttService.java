@@ -138,11 +138,11 @@ public class MqttService implements MqttCallback {
             if (Math.abs(newData - dataCalc[0]) > 3 * std) {
                 System.out.printf("%s is outlier%n", newData);
                 this.isOutliersJarak = true;
-                this.dataJarak = new ArrayList<>();
             } else {
                 this.dataJarak.add(newData);
             }
-            if (dataJarak.size() > 100) this.dataJarak = new ArrayList<>();
+
+            if (dataJarak.size() > 50) this.dataJarak = new ArrayList<>();
         } else {
             this.dataJarak.add(newData);
         }
@@ -190,7 +190,8 @@ public class MqttService implements MqttCallback {
 //                this.clientId, "/queue/specific-user/" + this.clientId, new OutputMessage("Chuck Norris", isSampahMasuk ? "Masuk" : "Tidak Masuk", time));
 
         this.isAllConditionTrue = this.isIRDetection = this.isOutliersJarak = false;
-        this.dataIR = this.dataJarak = new ArrayList<>();
+        this.dataIR = new ArrayList<>();
+        this.dataJarak = new ArrayList<>();
     }
 
 }
