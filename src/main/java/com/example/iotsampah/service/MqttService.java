@@ -38,6 +38,46 @@ public class MqttService implements MqttCallback {
         this.message = message;
     }
 
+    public boolean isOutliersJarak() {
+        return isOutliersJarak;
+    }
+
+    public void setOutliersJarak(boolean outliersJarak) {
+        isOutliersJarak = outliersJarak;
+    }
+
+    public boolean isIRDetection() {
+        return isIRDetection;
+    }
+
+    public void setIRDetection(boolean IRDetection) {
+        isIRDetection = IRDetection;
+    }
+
+    public boolean isAllConditionTrue() {
+        return isAllConditionTrue;
+    }
+
+    public void setAllConditionTrue(boolean allConditionTrue) {
+        isAllConditionTrue = allConditionTrue;
+    }
+
+    public List<Double> getDataJarak() {
+        return dataJarak;
+    }
+
+    public void setDataJarak(List<Double> dataJarak) {
+        this.dataJarak = dataJarak;
+    }
+
+    public List<Double> getDataIR() {
+        return dataIR;
+    }
+
+    public void setDataIR(List<Double> dataIR) {
+        this.dataIR = dataIR;
+    }
+
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     public MqttService(String uri, String topic, String clientId, SimpMessagingTemplate simpMessagingTemplate) throws MqttException, URISyntaxException {
@@ -122,7 +162,7 @@ public class MqttService implements MqttCallback {
                 this.dataDeviceIR(messageStr);
             }
             if (this.isAllConditionTrue) this.sendMessage();
-            else this.isAllConditionTrue = isIRDetection && isOutliersJarak;
+            else this.isAllConditionTrue = isIRDetection || (isIRDetection && isOutliersJarak);
         } catch (Exception err) {
             System.out.println(err);
         }
@@ -131,18 +171,17 @@ public class MqttService implements MqttCallback {
 
     public void dataDeviceJarak(String messageStr) {
         double newData = Double.parseDouble(messageStr);
-        if (dataJarak.size() > 3) {
-            Double[] dataCalc = this.calculateStats(this.dataJarak);
+        if (this.getDataJarak().size() > 3) {
+            Double[] dataCalc = this.calculateStats(this.getDataJarak());
             double std = Math.sqrt(dataCalc[1]);
             System.out.printf("Avg = %s, std = %s, data = %s%n", dataCalc[0], 3 * std, newData);
             if (Math.abs(newData - dataCalc[0]) > 3 * std) {
                 System.out.printf("%s is outlier%n", newData);
-                this.isOutliersJarak = true;
+                this.setOutliersJarak(true);
             } else {
                 this.dataJarak.add(newData);
             }
-
-            if (dataJarak.size() > 50) this.dataJarak = new ArrayList<>();
+            if (this.getDataJarak().size() > 50) this.setDataJarak(new ArrayList<>());
         } else {
             this.dataJarak.add(newData);
         }
@@ -152,10 +191,10 @@ public class MqttService implements MqttCallback {
         double newData = Double.parseDouble(messageStr);
         this.dataIR.add(newData);
 //        if (dataIR.size() > 1) {
-            Double[] dataCalc = this.calculateStats(this.dataIR);
+            Double[] dataCalc = this.calculateStats(this.getDataIR());
             System.out.printf("Avg is: %s, ceil is: %s%n", dataCalc[0], Math.ceil(dataCalc[0]));
             if (Math.ceil(dataCalc[0]) > 0) {
-                this.isIRDetection = true;
+                this.setIRDetection(true);
             }
 //        }
     }
@@ -189,9 +228,12 @@ public class MqttService implements MqttCallback {
 //        this.simpMessagingTemplate.convertAndSendToUser(
 //                this.clientId, "/queue/specific-user/" + this.clientId, new OutputMessage("Chuck Norris", isSampahMasuk ? "Masuk" : "Tidak Masuk", time));
 
-        this.isAllConditionTrue = this.isIRDetection = this.isOutliersJarak = false;
+        this.isAllConditionTrue = false;
+        this.setIRDetection(false);
+        this.setOutliersJarak(false);
         this.dataIR = new ArrayList<>();
-        this.dataJarak = new ArrayList<>();
+        this.setDataIR(new ArrayList<>());
+        this.setDataJarak(new ArrayList<>());
     }
 
 }
