@@ -15,4 +15,5 @@ public class MstSchools {
     private Integer id;
     private String name;
     private String code;
+    private String url;
 }
