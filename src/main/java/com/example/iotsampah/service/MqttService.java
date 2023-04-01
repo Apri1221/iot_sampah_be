@@ -19,7 +19,7 @@ public class MqttService implements MqttCallback {
     private MqttClient client;
     private String username = "lvntsnrq";
     private String password = "79W8iNWE4G9i";
-    private boolean isOutliersJarak, isIRDetection, isAllConditionTrue;
+    private boolean isOutliersJarak, isIRDetection, isAllConditionTrue, isPIRDetection;
     private List<Double> dataJarak = new ArrayList<>();
     private List<Double> dataIR = new ArrayList<>();
 
@@ -60,6 +60,14 @@ public class MqttService implements MqttCallback {
 
     public void setAllConditionTrue(boolean allConditionTrue) {
         isAllConditionTrue = allConditionTrue;
+    }
+
+    public boolean isPIRDetection() {
+        return isPIRDetection;
+    }
+
+    public void setPIRDetection(boolean PIRDetection) {
+        isPIRDetection = PIRDetection;
     }
 
     public List<Double> getDataJarak() {
@@ -156,7 +164,9 @@ public class MqttService implements MqttCallback {
         this.setMessage(messageStr);
 
         try {
-            if (topic.contains("jarak")) {
+            if (topic.contains("pir")) {
+                this.dataDevicePIR(messageStr);
+            } else if (topic.contains("jarak")) {
                 this.dataDeviceJarak(messageStr);
             } else if (topic.contains("ir")) {
                 this.dataDeviceIR(messageStr);
@@ -199,6 +209,14 @@ public class MqttService implements MqttCallback {
 //        }
     }
 
+    public void dataDevicePIR(String messageStr) {
+//        double newData = Double.parseDouble(messageStr);
+        this.setPIRDetection(true);
+        final String time = new SimpleDateFormat("HH:mm").format(new Date());
+        this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
+                new OutputMessage("Chuck Norris", "-1", time));
+    }
+
     private Double[] calculateStats(List<Double> data) {
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
@@ -220,20 +238,18 @@ public class MqttService implements MqttCallback {
     public void sendMessage() {
         boolean isSampahMasuk = this.isAllConditionTrue;
         final String time = new SimpleDateFormat("HH:mm").format(new Date());
-
-//        pushMessage.invokeWebSocketEndpoint("/topic/pushmessages", new OutputMessage("Chuck Norris", isSampahMasuk ? "Masuk" : "Tidak Masuk", time));
         this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
-                new OutputMessage("Chuck Norris", isSampahMasuk ? "Masuk" : "Tidak Masuk", time));
+                new OutputMessage("Chuck Norris", isSampahMasuk ? "1" : "0", time));
 
 //        this.simpMessagingTemplate.convertAndSendToUser(
 //                this.clientId, "/queue/specific-user/" + this.clientId, new OutputMessage("Chuck Norris", isSampahMasuk ? "Masuk" : "Tidak Masuk", time));
 
-        this.isAllConditionTrue = false;
+        this.setAllConditionTrue(false);
         this.setIRDetection(false);
         this.setOutliersJarak(false);
-        this.dataIR = new ArrayList<>();
         this.setDataIR(new ArrayList<>());
         this.setDataJarak(new ArrayList<>());
+        this.setPIRDetection(false);
     }
 
 }
