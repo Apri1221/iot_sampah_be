@@ -40,6 +40,7 @@ public class WebClientService {
         Map<String, Map<String, Map<String, Object>>> clientResponse = client.get().uri(String.format("/api/saldo/%s", studentId)).retrieve().bodyToMono(Map.class).block();
         Map<String, Map<String, Object>> data = clientResponse.get("data");
         Map<String, Object> saldo = data.get("saldo");
+        if (saldo == null) return 0;
         return Integer.valueOf(saldo.get("balance_cash").toString());
     }
 
