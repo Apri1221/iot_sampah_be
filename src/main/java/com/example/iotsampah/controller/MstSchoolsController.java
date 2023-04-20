@@ -34,7 +34,7 @@ public class MstSchoolsController {
         return ResponseEntity.ok(mstSchools);
     }
 
-    @PostMapping("/")
+    @GetMapping("/")
     public ResponseEntity getAllSchools() {
         List<MstSchools> mstSchoolsList = mstSchoolsService.getAllSchools();
         return ResponseEntity.ok(mstSchoolsList);

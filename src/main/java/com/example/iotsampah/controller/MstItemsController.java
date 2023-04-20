@@ -34,7 +34,7 @@ public class MstItemsController {
         return ResponseEntity.ok(mstItems);
     }
 
-    @PostMapping("/")
+    @GetMapping("/")
     public ResponseEntity getAllSchools() {
         List<MstItems> mstItemsList = mstItemsService.getAllItems();
         return ResponseEntity.ok(mstItemsList);

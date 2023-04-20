@@ -33,7 +33,7 @@ public class MstDevicesController {
         return ResponseEntity.ok(mstDevices);
     }
 
-    @PostMapping("/")
+    @GetMapping("/")
     public ResponseEntity getAllDevices() {
         List<MstDevices> mstDevices = mstDevicesService.getAllDevices();
         return ResponseEntity.ok(mstDevices);
