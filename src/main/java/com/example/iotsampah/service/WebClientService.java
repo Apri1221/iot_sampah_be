@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +24,37 @@ public class WebClientService {
         return clientResponse;
     }
 
-    Map<String, Object> resolveDataStudent(String url, String nisn) throws JsonProcessingException {
+    Map<String, Object> resolveDataStudent(String url, String nis) throws JsonProcessingException {
         WebClient client = WebClient.builder().baseUrl(String.format("%s", url)).build();
         ObjectMapper mapper = new ObjectMapper();
         TypeFactory typeFactory = mapper.getTypeFactory();
-        String clientResponse = client.get().uri(String.format("/api/student?nisn=%s", nisn)).retrieve().bodyToMono(String.class).block();
+        String clientResponse = client.get().uri(String.format("/api/student?nis=%s", nis)).retrieve().bodyToMono(String.class).block();
         List<Map<String, Object>> dataStudents = mapper.readValue(clientResponse, typeFactory.constructCollectionType(List.class, Map.class));
         return dataStudents.get(0);
+    }
+
+    public Integer getBalanceStudent(String url, Integer studentId) {
+        WebClient client = WebClient.builder().baseUrl(String.format("%s", url)).build();
+        ObjectMapper mapper = new ObjectMapper();
+        TypeFactory typeFactory = mapper.getTypeFactory();
+        Map<String, Map<String, Map<String, Object>>> clientResponse = client.get().uri(String.format("/api/saldo/%s", studentId)).retrieve().bodyToMono(Map.class).block();
+        Map<String, Map<String, Object>> data = clientResponse.get("data");
+        Map<String, Object> saldo = data.get("saldo");
+        return Integer.valueOf(saldo.get("balance_cash").toString());
+    }
+
+    boolean updateBalanceStudent(String url, Integer studentId, Integer saldo) {
+        WebClient client = WebClient.builder().baseUrl(String.format("%s", url)).build();
+        ObjectMapper mapper = new ObjectMapper();
+        TypeFactory typeFactory = mapper.getTypeFactory();
+        Map<String, Integer> data = new HashMap<>();
+        data.put("value", saldo);
+        try {
+            Map<String, Object> clientResponse = client.put().uri(String.format("/api/add/saldo/%s", studentId)).body(BodyInserters.fromValue(data)).retrieve().bodyToMono(Map.class).block();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

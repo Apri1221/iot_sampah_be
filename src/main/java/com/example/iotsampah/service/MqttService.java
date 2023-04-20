@@ -1,5 +1,6 @@
 package com.example.iotsampah.service;
 
+import com.example.iotsampah.entity.MstUsers;
 import com.example.iotsampah.entity.OutputMessage;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -88,25 +89,28 @@ public class MqttService implements MqttCallback {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public MqttService(String uri, String topic, String clientId, SimpMessagingTemplate simpMessagingTemplate) throws MqttException, URISyntaxException {
-        this(new URI(uri), topic, null, clientId, simpMessagingTemplate);
+    private final MstUsersService mstUsersService;
+
+    private final AuditLogService auditLogService;
+
+
+    public MqttService(String uri, String topic, String clientId, SimpMessagingTemplate simpMessagingTemplate, MstUsersService mstUsersService, AuditLogService auditLogService) throws MqttException, URISyntaxException {
+        this(new URI(uri), topic, null, clientId, simpMessagingTemplate, mstUsersService, auditLogService);
     }
 
-    public MqttService(String uri, String[] topics, String clientId, SimpMessagingTemplate simpMessagingTemplate) throws MqttException, URISyntaxException {
-        this(new URI(uri), null, topics, clientId, simpMessagingTemplate);
+    public MqttService(String uri, String[] topics, String clientId, SimpMessagingTemplate simpMessagingTemplate, MstUsersService mstUsersService, AuditLogService auditLogService) throws MqttException, URISyntaxException {
+        this(new URI(uri), null, topics, clientId, simpMessagingTemplate, mstUsersService, auditLogService);
     }
 
-    public MqttService(URI uri, String topic, String[] topics, String clientId, SimpMessagingTemplate simpMessagingTemplate) throws MqttException {
+    public MqttService(URI uri, String topic, String[] topics, String clientId, SimpMessagingTemplate simpMessagingTemplate, MstUsersService mstUsersService, AuditLogService auditLogService) throws MqttException {
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.mstUsersService = mstUsersService;
+        this.auditLogService = auditLogService;
         String host = String.format("tcp://%s:%d", uri.getHost(), uri.getPort());
 //        String[] auth = this.getAuth(uri); auth[0] dan auth[1];
         this.topic = topic;
         this.topics = topics;
         this.clientId = clientId;
-
-//        if (!uri.getPath().isEmpty()) {
-//            this.topic = uri.getPath().substring(1);
-//        }
 
         MqttConnectOptions conOpt = new MqttConnectOptions();
         conOpt.setCleanSession(true);
@@ -117,11 +121,8 @@ public class MqttService implements MqttCallback {
         this.client.setCallback(this);
         this.client.connect(conOpt);
         this.client.unsubscribe(this.topics);
-        if (this.topic == null) {
-            this.client.subscribe(this.topics);
-        } else {
-            this.client.subscribe(this.topic, qos);
-        }
+        if (this.topic == null) this.client.subscribe(this.topics);
+        else this.client.subscribe(this.topic, qos);
     }
 
     private String[] getAuth(URI uri) {
@@ -160,7 +161,6 @@ public class MqttService implements MqttCallback {
      */
     public void messageArrived(String topic, MqttMessage message) throws MqttException {
         String messageStr = new String(message.getPayload());
-//        System.out.printf("[%s] - [%s]: %s%n", topic, this.clientId, messageStr);
         this.setMessage(messageStr);
 
         try {
@@ -215,6 +215,8 @@ public class MqttService implements MqttCallback {
         final String time = new SimpleDateFormat("HH:mm").format(new Date());
         this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
                 new OutputMessage("Chuck Norris", "-1", time));
+
+        this.auditLog(-1);
     }
 
     private Double[] calculateStats(List<Double> data) {
@@ -241,6 +243,7 @@ public class MqttService implements MqttCallback {
         this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
                 new OutputMessage("Chuck Norris", isSampahMasuk ? "1" : "0", time));
 
+        this.auditLog(isSampahMasuk ? 1 : 0);
 //        this.simpMessagingTemplate.convertAndSendToUser(
 //                this.clientId, "/queue/specific-user/" + this.clientId, new OutputMessage("Chuck Norris", isSampahMasuk ? "Masuk" : "Tidak Masuk", time));
 
@@ -252,4 +255,11 @@ public class MqttService implements MqttCallback {
         this.setPIRDetection(false);
     }
 
+
+    public void auditLog(Integer point) {
+        String[] data = this.clientId.split("-");
+
+        MstUsers mstUsers = mstUsersService.getUser(Integer.valueOf(data[2]));
+        auditLogService.auditLogPoint(point, mstUsers);
+    }
 }

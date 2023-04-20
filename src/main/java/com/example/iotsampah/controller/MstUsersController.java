@@ -4,12 +4,15 @@ import com.example.iotsampah.entity.MstSchools;
 import com.example.iotsampah.entity.MstUsers;
 import com.example.iotsampah.service.MstSchoolsService;
 import com.example.iotsampah.service.MstUsersService;
+import com.example.iotsampah.service.WebClientService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/users")
@@ -21,6 +24,9 @@ public class MstUsersController {
     @Autowired
     MstSchoolsService mstSchoolsService;
 
+    @Autowired
+    WebClientService webClientService;
+
     @PostMapping("/store")
     public ResponseEntity storeUser(@RequestBody MstUsers mstUsers) {
         mstUsersService.storeUser(mstUsers);
@@ -29,8 +35,9 @@ public class MstUsersController {
 
     @PostMapping("/update")
     public ResponseEntity updateUser(@RequestBody MstUsers mstUsers) {
-        mstUsersService.updateUser(mstUsers);
-        return ResponseEntity.ok("success");
+        boolean isUpdated = mstUsersService.updateUser(mstUsers);
+        if (isUpdated) return ResponseEntity.ok("success");
+        return ResponseEntity.badRequest().body("failed");
     }
 
     @GetMapping("/get/{id}")
@@ -47,6 +54,8 @@ public class MstUsersController {
             MstSchools mstSchools = mstSchoolsService.getDataSchool(data[1]);
             mstUsers = mstUsersService.getDataUser(mstSchools, data[0]);
         }
+        Integer dataBalance = webClientService.getBalanceStudent(mstUsers.getSchool().getUrl(), mstUsers.getStudentId());
+        mstUsers.setSaldo(dataBalance);
         return ResponseEntity.ok(mstUsers);
     }
 }

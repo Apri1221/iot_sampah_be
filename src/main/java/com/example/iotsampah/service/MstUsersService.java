@@ -1,5 +1,6 @@
 package com.example.iotsampah.service;
 
+import com.example.iotsampah.entity.MstItems;
 import com.example.iotsampah.entity.MstSchools;
 import com.example.iotsampah.entity.MstUsers;
 import com.example.iotsampah.repository.MstUsersRepository;
@@ -20,18 +21,33 @@ public class MstUsersService {
     @Autowired
     WebClientService webClientService;
 
+    @Autowired
+    AuditLogService auditLogService;
+
+    @Autowired
+    MstItemsService mstItemsService;
+
     public void storeUser(MstUsers mstUsers) {
         mstUsersRepository.save(mstUsers);
     }
 
-    public void updateUser(MstUsers mstUsers) {
+    public boolean updateUser(MstUsers mstUsers) {
         Optional<MstUsers> mstUsersQuery = mstUsersRepository.findById(mstUsers.getId());
         MstUsers mstUsersOld = mstUsersQuery.orElse(null);
-
         if (mstUsersOld != null) {
+            MstItems mstItems = mstItemsService.getItemByCode("BTL");
+            int currPoint = mstUsersOld.getPoint();
+            int currSaldo = mstUsersOld.getSaldo();
+
             mstUsers.setId(mstUsersOld.getId());
-            mstUsersRepository.save(mstUsers);
+            mstUsers.setPoint(currPoint + mstUsers.getPoint());
+            mstUsers.setSaldo(currSaldo + (currPoint * mstItems.getPrice()));
+
+            boolean isUpdated = auditLogService.auditUpdatePoint(mstUsers.getPoint(), mstUsersOld);
+            if (isUpdated) mstUsersRepository.save(mstUsers);
+            return isUpdated;
         }
+        return false;
     }
 
     public MstUsers getUser(Integer id) {
@@ -49,13 +65,19 @@ public class MstUsersService {
         return mstUsers;
     }
 
-    public MstUsers getDataUser(MstSchools mstSchools, String nisn) throws JsonProcessingException {
-        Map<String, Object> dataStudent = webClientService.resolveDataStudent(mstSchools.getUrl(), nisn);
+    public MstUsers getDataUser(MstSchools mstSchools, String nis) throws JsonProcessingException {
+        Map<String, Object> dataStudent = webClientService.resolveDataStudent(mstSchools.getUrl(), nis);
         MstUsers mstUsers = new MstUsers();
         mstUsers.setName(String.format("%s",dataStudent.get("name")));
-        mstUsers.setNis(nisn);
+        mstUsers.setStudentId(Integer.valueOf(String.format("%s",dataStudent.get("student_id"))));
+        mstUsers.setNis(nis);
         mstUsers.setSchool(mstSchools);
         mstUsersRepository.save(mstUsers);
         return mstUsers;
+    }
+
+
+    public void publishPoint() {
+
     }
 }
