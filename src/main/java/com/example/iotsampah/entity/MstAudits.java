@@ -17,7 +17,7 @@ public class MstAudits {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @ManyToOne(targetEntity=MstUsers.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity=MstUsers.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by")
     private MstUsers createdBy;
 
