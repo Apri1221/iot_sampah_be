@@ -19,8 +19,8 @@ public class MstSchoolsService {
     @Autowired
     WebClientService webClientService;
 
-    public void storeSchool(MstSchools mstSchools) {
-        mstSchoolsRepository.save(mstSchools);
+    public MstSchools storeSchool(MstSchools mstSchools) {
+        return mstSchoolsRepository.save(mstSchools);
     }
 
     public void updateSchool(MstSchools mstSchools) {
