@@ -51,7 +51,7 @@ public class WebClientService {
         Map<String, Integer> data = new HashMap<>();
         data.put("value", saldo);
         try {
-            Map<String, Object> clientResponse = client.put().uri(String.format("/api/saldo/add/%s", studentId)).body(BodyInserters.fromValue(data)).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> clientResponse = client.post().uri(String.format("/api/saldo/add/%s", studentId)).body(BodyInserters.fromValue(data)).retrieve().bodyToMono(Map.class).block();
             return true;
         } catch (Exception e) {
             e.printStackTrace();

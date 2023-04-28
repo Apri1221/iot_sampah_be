@@ -1,7 +1,9 @@
 package com.example.iotsampah;
 
+import com.example.iotsampah.entity.MstDevices;
 import com.example.iotsampah.entity.MstItems;
 import com.example.iotsampah.entity.MstSchools;
+import com.example.iotsampah.service.MstDevicesService;
 import com.example.iotsampah.service.MstItemsService;
 import com.example.iotsampah.service.MstSchoolsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class IotSampahApplication {
 	@Autowired
 	MstSchoolsService mstSchoolsService;
 
+	@Autowired
+	MstDevicesService mstDevicesService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(IotSampahApplication.class, args);
 	}
@@ -40,6 +45,12 @@ public class IotSampahApplication {
 		mstItems.setPrice(100);
 		mstItems.setSchool(mstSchoolsFinal);
 		mstItemsService.storeItem(mstItems);
+
+		MstDevices mstDevices = new MstDevices();
+		mstDevices.setCode("node");
+		mstDevices.setType("ir");
+		mstDevices.setSchool(mstSchoolsFinal);
+		mstDevicesService.storeDevice(mstDevices);
 	}
 
 }
