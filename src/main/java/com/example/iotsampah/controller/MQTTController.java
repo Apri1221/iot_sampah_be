@@ -43,10 +43,9 @@ public class MQTTController {
     @GetMapping("/subscribe")
     public ResponseEntity subscribeMessage(
             @RequestParam(value = "topic", required = false) String topic,
-            @RequestParam(value = "school_id") Integer schoolId, @RequestParam(value = "user_id") Integer userId) throws MqttException, URISyntaxException {
+            @RequestParam(value = "school_id", required = false) Integer schoolId, @RequestParam(value = "user_id", required = false) Integer userId) throws MqttException, URISyntaxException {
         List<String> topics = topic == null ? new ArrayList<>() : Arrays.asList(topic.split("\\s*,\\s*"));
-        String clientId = String.format("%s-%s",schoolId, userId);
-//        String clientId = UUID.randomUUID().toString();
+        String clientId = schoolId != null && userId != null ? String.format("%s-%s",schoolId, userId) : UUID.randomUUID().toString();
         if (topics.size() == 0) {
             topics = mstDevicesService.getTopicsBySchoolId(schoolId);
         }

@@ -180,13 +180,13 @@ public class MqttService implements MqttCallback {
 
     public void dataDeviceJarak(String messageStr) {
         double newData = Double.parseDouble(messageStr);
-        if (this.getDataJarak().size() > 10) {
+        if (this.getDataJarak().size() > 5) {
             Double[] dataCalc = this.calculateStats(this.getDataJarak());
             double std = Math.sqrt(dataCalc[1]);
             System.out.printf("Avg = %s, std = %s, data = %s%n", dataCalc[0], 3 * std, newData);
 
             final String time = new SimpleDateFormat("HH:mm").format(new Date());
-            this.simpMessagingTemplate.convertAndSend("/topic/bucket",
+            this.simpMessagingTemplate.convertAndSend("/topic/bucket/" + this.clientId,
                     new OutputMessage("Chuck Norris", String.format("%s", (newData / dataCalc[0]) * 100), time));
         } else {
             this.dataJarak.add(newData);
@@ -252,7 +252,7 @@ public class MqttService implements MqttCallback {
         this.setIRDetection(false);
         this.setOutliersJarak(false);
         this.setDataIR(new ArrayList<>());
-        this.setDataJarak(new ArrayList<>());
+//        this.setDataJarak(new ArrayList<>());
         this.setPIRDetection(false);
     }
 
