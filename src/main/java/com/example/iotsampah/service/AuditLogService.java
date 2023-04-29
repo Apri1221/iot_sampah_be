@@ -42,7 +42,7 @@ public class AuditLogService {
         mstAudits.setSaldo(currSaldo + (point * mstItems.getPrice())); // saldo
         mstAudits.setCreatedBy(mstUsers);
 //        boolean isUpdated = true;
-        boolean isUpdated = webClientService.updateBalanceStudent(mstUsers.getSchool().getUrl(), mstUsers.getStudentId(), point);
+        boolean isUpdated = webClientService.updateBalanceStudent(mstUsers.getSchool().getUrl(), mstUsers.getStudentId(), mstAudits.getSaldo());
         if (isUpdated) {
             mstAuditsRepository.save(mstAudits);
         }
