@@ -39,10 +39,11 @@ public class AuditLogService {
 
         // current saldo =
         int currSaldo = mstUsers.getSaldo();
-        mstAudits.setSaldo(currSaldo + (point * mstItems.getPrice())); // saldo
+        int newSaldo = point * mstItems.getPrice();
+        mstAudits.setSaldo(currSaldo + newSaldo); // saldo
         mstAudits.setCreatedBy(mstUsers);
 //        boolean isUpdated = true;
-        boolean isUpdated = webClientService.updateBalanceStudent(mstUsers.getSchool().getUrl(), mstUsers.getStudentId(), mstAudits.getSaldo());
+        boolean isUpdated = webClientService.updateBalanceStudent(mstUsers.getSchool().getUrl(), mstUsers.getStudentId(), newSaldo);
         if (isUpdated) {
             mstAuditsRepository.save(mstAudits);
         }
