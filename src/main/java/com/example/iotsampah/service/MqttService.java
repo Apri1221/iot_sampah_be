@@ -162,7 +162,7 @@ public class MqttService implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws MqttException {
         String messageStr = new String(message.getPayload());
         this.setMessage(messageStr);
-
+        System.out.println(String.format("New data from %s, with value: %s", topic, messageStr));
         try {
             if (topic.contains("pir")) {
                 this.dataDevicePIR(messageStr);
