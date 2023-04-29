@@ -171,42 +171,43 @@ public class MqttService implements MqttCallback {
             } else if (topic.contains("ir")) {
                 this.dataDeviceIR(messageStr);
             }
-            if (this.isAllConditionTrue) this.sendMessage();
-            else this.isAllConditionTrue = isIRDetection || (isIRDetection && isOutliersJarak);
         } catch (Exception err) {
             System.out.println(err);
+        } finally {
+            this.sendMessage();
         }
-
     }
 
     public void dataDeviceJarak(String messageStr) {
         double newData = Double.parseDouble(messageStr);
-        if (this.getDataJarak().size() > 3) {
+        if (this.getDataJarak().size() > 10) {
+            this.dataJarak.add(newData);
             Double[] dataCalc = this.calculateStats(this.getDataJarak());
             double std = Math.sqrt(dataCalc[1]);
             System.out.printf("Avg = %s, std = %s, data = %s%n", dataCalc[0], 3 * std, newData);
-            if (Math.abs(newData - dataCalc[0]) > 3 * std) {
-                System.out.printf("%s is outlier%n", newData);
-                this.setOutliersJarak(true);
-            } else {
-                this.dataJarak.add(newData);
-            }
-            if (this.getDataJarak().size() > 50) this.setDataJarak(new ArrayList<>());
         } else {
             this.dataJarak.add(newData);
         }
     }
 
+    public double getMeanJarak() {
+        Double[] dataCalc = this.calculateStats(this.getDataJarak());
+        return Math.sqrt(dataCalc[1]);
+    }
+
+
     public void dataDeviceIR(String messageStr) {
         double newData = Double.parseDouble(messageStr);
         this.dataIR.add(newData);
-//        if (dataIR.size() > 1) {
-            Double[] dataCalc = this.calculateStats(this.getDataIR());
-            System.out.printf("Avg is: %s, ceil is: %s%n", dataCalc[0], Math.ceil(dataCalc[0]));
-            if (Math.ceil(dataCalc[0]) > 0) {
-                this.setIRDetection(true);
-            }
-//        }
+        Double[] dataCalc = this.calculateStats(this.getDataIR());
+        System.out.printf("Avg is: %s, ceil is: %s%n", dataCalc[0], Math.ceil(dataCalc[0]));
+        if (Math.ceil(dataCalc[0]) > 0) {
+            this.setIRDetection(true);
+            final String time = new SimpleDateFormat("HH:mm").format(new Date());
+            this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
+                    new OutputMessage("Chuck Norris", "1", time));
+            this.auditLog(1);
+        }
     }
 
     public void dataDevicePIR(String messageStr) {
@@ -215,7 +216,6 @@ public class MqttService implements MqttCallback {
         final String time = new SimpleDateFormat("HH:mm").format(new Date());
         this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
                 new OutputMessage("Chuck Norris", "-1", time));
-
         this.auditLog(-1);
     }
 
@@ -224,8 +224,7 @@ public class MqttService implements MqttCallback {
         double max = Double.MIN_VALUE;
         double average = 0;
         double variance = 0;
-        for (int i = 0; i < data.size(); i++) {
-            double sample = data.get(i);
+        for (double sample : data) {
             if (sample > max) max = sample;
             if (sample < min) min = sample;
             average += sample;
@@ -233,17 +232,16 @@ public class MqttService implements MqttCallback {
         }
         average = average / data.size();
         variance = variance / data.size() - average * average;
-        Double[] dataCalc = {average, variance};
-        return dataCalc;
+        return new Double[]{average, variance};
     }
 
     public void sendMessage() {
-        boolean isSampahMasuk = this.isAllConditionTrue;
-        final String time = new SimpleDateFormat("HH:mm").format(new Date());
-        this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
-                new OutputMessage("Chuck Norris", isSampahMasuk ? "1" : "0", time));
+//        boolean isSampahMasuk = this.isAllConditionTrue;
+//        final String time = new SimpleDateFormat("HH:mm").format(new Date());
+//        this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
+//                new OutputMessage("Chuck Norris", isSampahMasuk ? "1" : "0", time));
 
-        this.auditLog(isSampahMasuk ? 1 : 0);
+//        this.auditLog(isSampahMasuk ? 1 : 0);
 //        this.simpMessagingTemplate.convertAndSendToUser(
 //                this.clientId, "/queue/specific-user/" + this.clientId, new OutputMessage("Chuck Norris", isSampahMasuk ? "Masuk" : "Tidak Masuk", time));
 
