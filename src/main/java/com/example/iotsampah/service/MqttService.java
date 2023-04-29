@@ -181,10 +181,13 @@ public class MqttService implements MqttCallback {
     public void dataDeviceJarak(String messageStr) {
         double newData = Double.parseDouble(messageStr);
         if (this.getDataJarak().size() > 10) {
-            this.dataJarak.add(newData);
             Double[] dataCalc = this.calculateStats(this.getDataJarak());
             double std = Math.sqrt(dataCalc[1]);
             System.out.printf("Avg = %s, std = %s, data = %s%n", dataCalc[0], 3 * std, newData);
+
+            final String time = new SimpleDateFormat("HH:mm").format(new Date());
+            this.simpMessagingTemplate.convertAndSend("/topic/bucket",
+                    new OutputMessage("Chuck Norris", String.format("%s", (newData / dataCalc[0]) * 100), time));
         } else {
             this.dataJarak.add(newData);
         }

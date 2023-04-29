@@ -30,16 +30,16 @@ public class AuditLogService {
         mstAuditsRepository.save(mstAudits);
     }
 
-    public boolean auditUpdatePoint(Integer point, MstUsers mstUsers) {
+    public boolean auditUpdatePoint(Integer newPoint, MstUsers mstUsers) {
         MstItems mstItems = mstItemsService.getItemByCode("BTL");
 
         MstAudits mstAudits = new MstAudits();
         mstAudits.setType("MUTATION");
-        mstAudits.setPoint(point);
+        mstAudits.setPoint(newPoint);
 
         // current saldo =
         int currSaldo = mstUsers.getSaldo();
-        int newSaldo = point * mstItems.getPrice();
+        int newSaldo = newPoint * mstItems.getPrice();
         mstAudits.setSaldo(currSaldo + newSaldo); // saldo
         mstAudits.setCreatedBy(mstUsers);
 //        boolean isUpdated = true;

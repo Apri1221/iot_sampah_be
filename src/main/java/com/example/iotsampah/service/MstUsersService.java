@@ -37,14 +37,15 @@ public class MstUsersService {
         if (mstUsersOld != null) {
             MstItems mstItems = mstItemsService.getItemByCode("BTL");
             int currPoint = mstUsersOld.getPoint();
-            int currSaldo = mstUsersOld.getSaldo();
-
             mstUsers.setId(mstUsersOld.getId());
-            mstUsers.setPoint(currPoint + mstUsers.getPoint());
-            mstUsers.setSaldo(currSaldo + (currPoint * mstItems.getPrice()));
 
             boolean isUpdated = auditLogService.auditUpdatePoint(mstUsers.getPoint(), mstUsersOld);
-            if (isUpdated) mstUsersRepository.save(mstUsers);
+            if (isUpdated) {
+                mstUsers.setPoint(currPoint + mstUsers.getPoint());
+                mstUsers.setSaldo((currPoint + mstUsers.getPoint()) * mstItems.getPrice());
+
+                mstUsersRepository.save(mstUsers);
+            }
             return isUpdated;
         }
         return false;
