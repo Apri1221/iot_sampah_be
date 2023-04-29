@@ -51,6 +51,12 @@ public class IotSampahApplication {
 		mstDevices.setType("ir");
 		mstDevices.setSchool(mstSchoolsFinal);
 		mstDevicesService.storeDevice(mstDevices);
+
+		MstDevices mstDevices2 = new MstDevices();
+		mstDevices2.setCode("node");
+		mstDevices2.setType("pir");
+		mstDevices2.setSchool(mstSchoolsFinal);
+		mstDevicesService.storeDevice(mstDevices);
 	}
 
 }
