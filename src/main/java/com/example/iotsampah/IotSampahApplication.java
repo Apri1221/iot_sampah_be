@@ -62,7 +62,7 @@ public class IotSampahApplication {
 
 		MstDevices mstDevices3 = new MstDevices();
 		mstDevices3.setCode("node");
-		mstDevices3.setType("jarak");
+		mstDevices3.setType("backup-jarak");
 		mstDevices3.setSchool(mstSchoolsFinal);
 		mstDevicesService.storeDevice(mstDevices3);
 	}

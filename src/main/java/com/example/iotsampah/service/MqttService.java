@@ -201,16 +201,20 @@ public class MqttService implements MqttCallback {
 
 
     public void dataDeviceIR(String messageStr) {
-        double newData = Double.parseDouble(messageStr);
-        this.dataIR.add(newData);
-        Double[] dataCalc = this.calculateStats(this.getDataIR());
-        System.out.printf("Avg is: %s, ceil is: %s%n", dataCalc[0], Math.ceil(dataCalc[0]));
-        if (Math.ceil(dataCalc[0]) > 0) {
-            this.setIRDetection(true);
-            final String time = new SimpleDateFormat("HH:mm").format(new Date());
-            this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
-                    new OutputMessage("Chuck Norris", "1", time));
-            this.auditLog(1);
+        try {
+            double newData = Double.parseDouble(messageStr);
+            this.dataIR.add(newData);
+            Double[] dataCalc = this.calculateStats(this.getDataIR());
+            System.out.printf("Avg is: %s, ceil is: %s%n", dataCalc[0], Math.ceil(dataCalc[0]));
+            if (Math.ceil(dataCalc[0]) > 0) {
+                this.setIRDetection(true);
+                final String time = new SimpleDateFormat("HH:mm").format(new Date());
+                this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
+                        new OutputMessage("Chuck Norris", "1", time));
+                this.auditLog(1);
+            }
+        } catch (Exception e) {
+
         }
     }
 
