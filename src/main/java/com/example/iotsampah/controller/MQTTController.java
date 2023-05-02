@@ -55,6 +55,7 @@ public class MQTTController {
 
     @GetMapping("/unsubscribe/{clientId}")
     public ResponseEntity unsubscribeMessage(@RequestParam(value = "topic") String topic, @PathVariable(value = "clientId") String clientId) throws MqttException, URISyntaxException {
+        if (clientId == null) ResponseEntity.ok("Nothing");
         MqttService s = new MqttService(this.uri, topic, "server-" + clientId, simpMessagingTemplate, mstUsersService, auditLogService);
         s.unsubscribe(topic);
         return ResponseEntity.ok(s.getClientId());
