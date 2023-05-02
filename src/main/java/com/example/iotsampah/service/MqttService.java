@@ -215,12 +215,16 @@ public class MqttService implements MqttCallback {
     }
 
     public void dataDevicePIR(String messageStr) {
-//        double newData = Double.parseDouble(messageStr);
-        this.setPIRDetection(true);
-        final String time = new SimpleDateFormat("HH:mm").format(new Date());
-        this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
-                new OutputMessage("Chuck Norris", "-1", time));
-        this.auditLog(-1);
+        try {
+            double newData = Double.parseDouble(messageStr);
+            this.setPIRDetection(true);
+            final String time = new SimpleDateFormat("HH:mm").format(new Date());
+            this.simpMessagingTemplate.convertAndSend("/topic/pushmessages/" + this.clientId,
+                    new OutputMessage("Chuck Norris", "-1", time));
+            this.auditLog(-1);
+        } catch (Exception e) {
+
+        }
     }
 
     private Double[] calculateStats(List<Double> data) {
