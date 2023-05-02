@@ -5,6 +5,7 @@ import com.example.iotsampah.entity.OutputMessage;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -257,6 +258,7 @@ public class MqttService implements MqttCallback {
     }
 
 
+    @Async
     public void auditLog(Integer point) {
         String[] data = this.clientId.split("-");
 
