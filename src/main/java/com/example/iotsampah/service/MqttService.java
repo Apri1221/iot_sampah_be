@@ -19,8 +19,8 @@ public class MqttService implements MqttCallback {
     private String topic, clientId, message;
     private String[] topics;
     private MqttClient client;
-    private String username = "lvntsnrq";
-    private String password = "79W8iNWE4G9i";
+    private String username = "lvntsnrq"; // iugrxlsd
+    private String password = "79W8iNWE4G9i"; // SvMPeFM39kSn
     private boolean isOutliersJarak, isIRDetection, isAllConditionTrue, isPIRDetection;
     private List<Double> dataJarak = new ArrayList<>();
     private List<Double> dataIR = new ArrayList<>();

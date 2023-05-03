@@ -30,7 +30,7 @@ public class MQTTController {
     @Autowired
     AuditLogService auditLogService;
 
-    private final String uri = "tcp://tailor.cloudmqtt.com:16503";
+    private final String uri = "tcp://tailor.cloudmqtt.com:16503"; // tcp://driver.cloudmqtt.com:18553
 
     @GetMapping("/send")
     public ResponseEntity sendMessage(@RequestParam(value = "topic") String topic, @RequestBody String body) throws MqttException, URISyntaxException {
