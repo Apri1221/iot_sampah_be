@@ -58,4 +58,15 @@ public class WebClientService {
             return false;
         }
     }
+
+    boolean restartMQTT(String url) {
+        WebClient client = WebClient.builder().baseUrl(String.format("%s", "https://api.cloudmqtt.com/api/instance/restart")).build();
+        try {
+            String clientResponse = client.post().header("Authorization", "Basic ca85843e-6ad2-4a28-a148-fbd67767d98f").retrieve().bodyToMono(String.class).block();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
